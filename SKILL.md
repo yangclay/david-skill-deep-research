@@ -509,6 +509,25 @@ for r in d.get('organic_results',[])[:5]:
 
 ---
 
+## 故障处理（if-then fallback）
+
+| # | 故障 | 触发条件 | 一线修复 | 仍失败兜底 |
+|---|------|---------|---------|-----------|
+| F1 | smart-search 零结果 | `smart-search.py` 返回空 JSON | 换同义词重搜（中英文各一次） | 降级到 `web_search`（DuckDuckGo 内置）+ 手动 `curl` 已知权威来源 |
+| F2 | Tavily 配额耗尽 | `tavily__tavily_research` 返回 429/quota error | 切到 SerpAPI Google + smart-search 组合 | 在报告标注"⚠️ Tavily 不可用，覆盖度可能不足"，继续用免费源完成 |
+| F3 | web_fetch 被拦截 | 返回 403 / 空内容 / Cloudflare challenge | 用 `scripts/scrape-stealth.py --mode stealth` 重试 | 用 TinyFish Fetch（`references/tinyfish-api.md`）或标注"来源不可抓取，仅用摘要" |
+| F4 | Context window 溢出 | 搜索结果总量 > 70% context budget | 只保留去重后 top-20 来源的摘要（非全文），全文写入中间文件 | 分批处理：先处理子问题 1-3，写中间文件；再处理 4-5，合并 |
+| F5 | 核心结论全为 C/D 可信度 | Step 5 评估后无 A/B 级结论 | 针对 C/D 结论做 Step 8 迭代补搜（换 query、加 site: 过滤） | 在报告显式标注"⚠️ 核心结论证据不足，需人工判断"，不编造可信度 |
+| F6 | 质量自评 < 18/30 | Step 7 后 rubric 总分不达标 | 回溯最弱维度（通常是覆盖度或来源质量），补搜 2-3 轮 | 告知 Clay "当前质量待提升"，给出已完成的部分报告 + 建议补充方向 |
+| F7 | 来源严重矛盾 | ≥2 个权威来源对同一事实说法相反 | 查原始出处（论文/官方文档/一手数据），标注哪方更可信 | 并列呈现双方说法 + 矛盾原因分析，标注"需人工裁决" |
+
+**执行原则**：
+- F1-F3 是搜索层故障，自动修复不中断
+- F4-F5 是质量层故障，修复后继续
+- F6-F7 是交付层故障，必须告知 Clay
+
+---
+
 ## 引用验证
 
 重要结论必须验证：抓取原文 → 对比摘要 → 确认/否定
