@@ -119,161 +119,21 @@ python3 smart-search.py --cache-clear   # 清理过期缓存
 
 ---
 
-**补充搜索工具：**
+**补充工具速查**（smart-search 覆盖不够时）：
 
+| 工具 | 用什么 | 何时用 | 命令速查 |
+|------|--------|--------|---------|
+| Scrapling | 反爬抓取 | web_fetch 403/Cloudflare | `python3 scripts/scrape-stealth.py URL [--mode stealth/dynamic]` |
+| crawl4ai | 多页爬取 | 全站/文档站/博客 | `~/.hermes/tools/crawl4ai-venv/bin/python scripts/crawl_site.py URL --mode multi --max-pages 10` |
+| TinyFish | 浏览器渲染搜索+抓取 | 动态/实时内容 | Search: `GET api.search.tinyfish.ai` · Fetch: `POST api.fetch.tinyfish.ai`（详见 `references/tinyfish-api.md`） |
+| Tavily | AI 原生综合 | 深度调研必用 | `tavily__tavily_research`（自动多轮+综合）· `tavily__tavily_search`（快速） |
+| Exa | 语义搜索 | 找相似/相关论文 | `Exa`（EXA_API_KEY） |
+| GitHub API | 仓库搜索 | 开源工具对比 | `curl -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/search/repositories?q=KEY&sort=stars"` |
+| SerpAPI | 多引擎统一 | 中文/新闻/视频 | `curl "https://serpapi.com/search?q=KEY&api_key=$SERPAPI_API_KEY&engine=google/baidu/youtube"` |
+| 学术搜索 | 论文专项 | 学术调研 | `google-scholar-search` / `arxiv-scholar-search` skill |
+| web_search | DuckDuckGo | 兜底，无限免费 | 内置工具 |
 
-**Scrapling 反爬抓取**（web_fetch 被拦截时的替代）
-- 路径：`scripts/scrape-stealth.py`
-- 模式：http（默认，快速）/ stealth（绕 Cloudflare）/ dynamic（JS SPA）
-- 用法：
-  ```bash
-  # 基础抓取（替代 web_fetch）
-  python3 scripts/scrape-stealth.py https://example.com
-
-  # 绕过 Cloudflare
-  python3 scripts/scrape-stealth.py https://protected.com --mode stealth
-
-  # JS 渲染 SPA
-  python3 scripts/scrape-stealth.py https://spa-site.com --mode dynamic
-
-  # 限制长度
-  python3 scripts/scrape-stealth.py https://example.com --max-chars 8000
-  ```
-- 适用场景：web_fetch 返回 403/空内容/Cloudflare challenge、SPA 动态渲染页面
-- 自动降级：http → stealth → dynamic，无需手动选模式
-- 依赖：`pip install scrapling[all]`（venv: `workspace-shared/venvs/deep-research/`，已装好）
-- 浏览器：使用系统 Chrome（`/usr/bin/google-chrome`），无需额外下载。脚本 shebang 指向共享 venv。
-
-**crawl4ai 多页爬取**（需要爬取整个站点或多个页面时）
-- 路径：`scripts/crawl_site.py`
-- 依赖：crawl4ai venv `~/.hermes/tools/crawl4ai-venv/bin/python`
-- 三种模式：
-  ```bash
-  # 单页抓取（替代 web_fetch，输出更干净）
-  ~/.hermes/tools/crawl4ai-venv/bin/python scripts/crawl_site.py https://example.com --mode single
-
-  # 多页爬取：自动跟踪同域链接，最多 N 页
-  ~/.hermes/tools/crawl4ai-venv/bin/python scripts/crawl_site.py https://docs.example.com --mode multi --max-pages 10
-
-  # Sitemap 模式：从 /sitemap.xml 发现 URL 并批量抓取
-  ~/.hermes/tools/crawl4ai-venv/bin/python scripts/crawl_site.py https://blog.example.com --mode sitemap --max-pages 50
-
-  # JS 渲染（SPA 页面）
-  ~/.hermes/tools/crawl4ai-venv/bin/python scripts/crawl_site.py https://spa-site.com --mode multi --js
-
-  # JSON 输出（方便程序处理）
-  ~/.hermes/tools/crawl4ai-venv/bin/python scripts/crawl_site.py https://example.com --mode multi --json -o /tmp/crawl_result.json
-  ```
-- 适用场景：需要爬取整个文档站、博客全站、产品列表页等多页内容
-- 与 Scrapling 的区别：Scrapling 是单页反爬专家，crawl4ai 是多页爬取 + JS 渲染
-- 浏览器：首次使用需安装 Chromium（`~/.hermes/tools/crawl4ai-venv/bin/python -m playwright install chromium`）
-
-**TinyFish Search & Fetch（免费，浏览器渲染）**
-- 完整文档：`references/tinyfish-api.md`
-- **Search API**：`GET https://api.search.tinyfish.ai` — 真浏览器渲染的实时搜索，返回结构化 JSON。免费（0 credits），限速 30 req/min。适合动态/实时内容（价格变动、财报、突发新闻）
-- **Fetch API**：`POST https://api.fetch.tinyfish.ai` — 真浏览器渲染页面，返回干净 markdown/JSON/HTML。免费（0 credits），限速 150 url/min。可替代 scrape-stealth.py（托管服务，无需本地浏览器）
-- 环境变量：`TINYFISH_API_KEY`（https://agent.tinyfish.ai/api-keys）
-- 安装：`pip install tinyfish`（SDK）或 `npm install -g @tiny-fish/cli`（CLI）
-- **适用场景**：web_fetch 返回 403/JS 重页面 → TinyFish Fetch；需要实时动态搜索结果 → TinyFish Search
-- **不适用**：需要多引擎（Google/Baidu/Bing）→ 用 SerpAPI；需要自动综合 → 用 Tavily
-
-**Tavily 搜索（AI 原生）**
-- `tavily__tavily_research` — 一次调用 = 自动多轮搜索 + 内容抓取 + 综合报告。深度调研必用，但注意每月限额（~1000次），省着用。
-- `tavily__tavily_search` — 快速搜索，参数：query, search_depth(basic/advanced), max_results, include_domains, exclude_domains, time_range
-
-**Exa 语义搜索**
-- `Exa`（OpenClaw 原生支持，EXA_API_KEY）— 找相似内容、相关论文、主题探索
-
-**GitHub 代码仓库搜索（技术工具专项）**
-GitHub API 搜索代码仓库，支持星标排序、主题过滤。环境变量：`GITHUB_TOKEN`（5000次/小时，无需 key 只能 60次）。
-
-```bash
-# 搜索仓库（按星标排序）
-curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-  "https://api.github.com/search/repositories?q=关键词&sort=stars&per_page=10"
-
-# 解析结果
-curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-  "https://api.github.com/search/repositories?q=AI+CLI+tool&sort=stars&per_page=5" \
-  | python3 -c "
-import sys,json
-d=json.load(sys.stdin)
-for r in d['items'][:5]:
-    print(r['full_name'], '⭐', r['stargazers_count'])
-    print(r.get('description',''))
-    print(r['html_url'])
-    print()
-"
-```
-
-**适用场景**：找开源工具、对比同类项目、查项目活跃度、看 README 了解功能。
-
-**ClawHub / Stack Overflow 工具发现**
-- **ClawHub**（skill 发现）：
-  ```bash
-  clawhub search "关键词"        # 搜索 skill
-  clawhub list                   # 列出已安装
-  clawhub install skill-name     # 安装
-  ```
-  需要 `clawhub` CLI（npm i -g clawhub）
-- **Stack Overflow**：搜索技术问题/报错
-  ```bash
-  # SerpAPI Google 搜 Stack Overflow
-  curl -s "https://serpapi.com/search?q=关键词+site:stackoverflow.com&api_key=$SERPAPI_API_KEY&num=10"
-  # 或 DuckDuckGo
-  curl -s "https://api.duckduckgo.com/?q=关键词+site:stackoverflow.com&format=json" | python3 -c "
-import sys,json
-d=json.load(sys.stdin)
-for r in d.get('RelatedTopics',[])[:5]:
-    if 'stackoverflow' in r.get('URL',''):
-        print(r.get('Text',''))
-        print(r.get('URL',''))
-        print()
-"
-  ```
-
-**SerpAPI 统一搜索（补充中文/商业/新闻）**
-[SerpAPI](https://serpapi.com) 统一封装 15+ 搜索引擎，一次调用切换引擎。环境变量：`SERPAPI_API_KEY`。
-
-```bash
-# Google（默认，中英文兼顾）
-curl -s "https://serpapi.com/search?q=搜索词&api_key=$SERPAPI_API_KEY&engine=google&num=10"
-
-# 百度（中文内容优先）
-curl -s "https://serpapi.com/search?q=搜索词&api_key=$SERPAPI_API_KEY&engine=baidu&num=10"
-
-# Bing
-curl -s "https://serpapi.com/search?q=搜索词&api_key=$SERPAPI_API_KEY&engine=bing&num=10"
-
-# YouTube（视频内容）
-curl -s "https://serpapi.com/search?q=搜索词&api_key=$SERPAPI_API_KEY&engine=youtube&num=5"
-
-# 解析结果（jq）
-curl -s "..." | python3 -c "
-import sys,json
-d=json.load(sys.stdin)
-for r in d.get('organic_results',[])[:5]:
-    print(r.get('title'))
-    print(r.get('link'))
-    print(r.get('snippet',''))
-    print()
-"
-```
-
-**引擎选择原则**：
-- 默认 Google（综合最好）
-- 中文内容为主 → 百度
-- 新闻/突发 → Google News 或 Bing
-- 视频调研 → YouTube
-- 俄语内容 → Yandex
-- 韩语内容 → Naver
-
-**学术搜索（论文相关时启用）**
-- `google-scholar-search` skill — Google 学术
-- `arxiv-scholar-search` skill — arXiv 预印本
-
-**兜底**
-- `web_search`（DuckDuckGo，内置）— 无限免费
+**引擎选择原则**：默认 Google → 中文为主用百度 → 新闻用 Bing → 视频用 YouTube → 学术用 Scholar → 兜底用 DuckDuckGo。
 
 ### Step 3：中文内容专项
 
