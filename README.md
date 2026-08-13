@@ -1,25 +1,58 @@
 # Orion Research（猎真）
 
-> **猎真（Orion Research）——深度调研技能：多源验证、可追溯、反幻觉。** 当问题需要跨来源调查、拆解子问题、验证关键结论、处理来源冲突时使用。
+> **让 AI 帮你调研时，给你的不是"答案"，而是"带证据链的结论"。**
 
 [![Version](https://img.shields.io/badge/version-v3.1.0-blue)](https://github.com/yangclay/orion-research)
 [![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](https://github.com/yangclay/orion-research/blob/master/LICENSE)
 
-用于 [Hermes Agent](https://github.com/NousResearch/hermes-agent) 的生产级深度调研技能（Agent Skill）。
+## 这是给谁的
 
-## 为什么需要它
+你正在用 AI Agent（Claude / GPT / 各类 agent 框架）做调研、查资料、写报告。你是不是遇到过这些情况：
 
-AI 调研最常见的失败模式不是"搜不到"，而是**搜到了但不可信**：
+- **AI 一本正经地编**：给了一个看起来很专业的数字，但来源其实是它自己编的
+- **搜到的全是垃圾**：中文搜索结果 top 10 全是百度文库、教育网站的拼凑内容
+- **信息是过时的**：AI 用 2023 年的资料回答你 2026 年的问题
+- **找不到出处**：AI 说"据某报告显示"，但你点开发现原文根本不支持这个结论
+- **矛盾被忽略**：两个来源说法相反，AI 默默选了一个，不告诉你
 
-| 失败模式 | 表现 |
-|----------|------|
-| 伪独立来源 | 8 个网页声称同一数字，实际全部转载同一个原始报道 |
-| SEO 内容农场 | 中文 top 结果多为百度教育/文库/百科等拼凑内容 |
-| 时效性过时 | 用 2023 年的信息回答 2026 年的问题 |
-| Citation 支撑失败 | 引用了但原文并不支持结论 |
-| 冲突静默 | 不同来源矛盾时静默选一个 |
+**问题不在 AI 不聪明，在于它缺少一套"调研方法论"。** 它像一个刚入行的实习生——搜索很快，但不知道什么是可信来源、怎么交叉验证、怎么识别软文。
 
-本技能用 **SaC（Search-as-Code）五段式管道 + 5 个核心 Gotcha** 系统性解决这些问题。
+Orion Research 就是给 AI 装上这套方法论。
+
+## 装了之后，AI 会怎么做
+
+同样一句"帮我调研一下 X"，装了 Orion Research 的 AI 会：
+
+1. **拆问题**：把大问题拆成几个子问题，逐个击破
+2. **多引擎搜索**：不止搜一遍，而是换多个搜索引擎交叉找
+3. **给来源分级**：每个结论标注可信度 A/B/C/D（A=一手权威来源，D=软文/可疑）
+4. **识别垃圾内容**：自动识别 SEO 农场、拼凑文、营销软文并降权
+5. **检查时效性**：标注信息的时间，过时的会提醒你
+6. **暴露矛盾**：不同来源冲突时，把冲突明明白白摆出来，而不是悄悄选一个
+7. **每个结论可追溯**：附上真实链接，你点开就能验证
+
+**最终交付的是一份"带证据链的调研报告"**，不是一段可能编造的小作文。
+
+## 快速开始
+
+### 安装
+
+```bash
+git clone https://github.com/yangclay/orion-research.git \
+  ~/.hermes/profiles/<你的profile>/skills/orion-research
+```
+
+### 使用
+
+装好之后不需要学习任何新东西——**正常向你的 AI 提问即可**。当问题涉及调研、对比、查证时，它会被自动触发：
+
+```
+"深度调研一下 XX 公司靠不靠谱"
+"对比 A 和 B 哪个更适合我们"
+"查一下 2026 年 XX 行业的真实情况"
+```
+
+> 简单事实查询（"今天几号"、"XX 的定义是什么"）不会触发，避免小题大做。
 
 ## 工作流
 
@@ -43,60 +76,30 @@ graph TD
     S3 -. "缺口 补搜" .-> S2
 ```
 
-核心：**搜索是可编程的**。用 `execute_code` 编排完整搜索管道（fanout → search → rerank → dedupe），只把压缩后的 top-N 结果带回上下文。
+## 它和普通 AI 搜索的区别
 
-## 安装
+| | 普通 AI 搜索 | Orion Research |
+|---|---|---|
+| 搜索 | 搜 1-2 次 | 多引擎交叉，中文生态专项覆盖（知乎/公众号/百度） |
+| 来源判断 | 基本不判断 | A/B/C/D 四级分级，软文自动识别 |
+| 时效性 | 常忽略 | 强制检查，过时信息标注 |
+| 引用 | 可能有，可能编 | 每个结论附可点击的真实链接 |
+| 矛盾 | 悄悄选一个 | 明示冲突，交给你判断 |
+| 深度 | 一次到位 | 有缺口自动补搜（最多 3 轮） |
+| 结论可信度 | 凭运气 | 系统化验证，伪独立来源/SEO 农场被拦截 |
 
-### 方式一：clone 到 Hermes profile（推荐）
+## 技术特点（给开发者）
 
-```bash
-git clone https://github.com/yangclay/orion-research.git \
-  ~/.hermes/profiles/<profile>/skills/orion-research
-```
-
-### 方式二：直接复制
-
-将 `SKILL.md` + `references/` + `scripts/` + `gotchas/` + `evals/` 复制到 `~/.hermes/profiles/<profile>/skills/orion-research/`。
-
-### 依赖
-
-- Python 3.12（scripts 依赖 `~/.local/lib/python3.12/site-packages`）
-- API keys 存于 `.env`：Tavily / SerpAPI / Exa / Searlo / TinyFish / Jina（全部免费额度）
-
-## 技能结构
-
-```
-orion-research/
-├── SKILL.md                        # 核心定义（7 步工作流 + ReAct/CodeAct 双模式）
-├── references/
-│   ├── sac-search-orchestration.md # SaC 五段式管道模板（核心，Step 2 用）
-│   ├── source-evaluation.md        # 来源可信度 A/B/C/D 分级
-│   ├── reporting.md                # 报告输出规范
-│   ├── failure-handling.md         # F1-F7 故障处理
-│   ├── tool-reference.md           # 中文调研专项 + 工具参考
-│   ├── research-report-management.md # 入库规则（仅用户明确指定时写盘）
-│   └── orion-research-user-patterns.md # 差距分析模式识别
-├── scripts/
-│   ├── web-fetch.sh                # curl 抓单页
-│   ├── scrape-stealth.py           # 反爬三模式（http/stealth/dynamic）
-│   └── crawl_site.py               # 全站抓取（crawl4ai）
-├── gotchas/                        # 5 个核心 Gotcha（G-001/012/013/014/017）
-└── evals/                          # 5 个行为化测试用例
-```
-
-## 特性
-
-- **SaC 五段式管道**：引擎选择是决策不是顺序——核心问题用 Tavily，一般问题停免费层，中文用 SerpAPI 百度
-- **Jina 统一重排**：所有引擎结果汇合后一次打分，过滤 <0.3，杜绝低质量来源混入
-- **Gap Analysis 循环控制**：质量够就停（省 token 省 RPM），有缺口定向补搜（最多 3 轮）
-- **确定性独立验证**：Step 6 用规则复核（来源可追溯/A 级 ≥2 独立源/冲突可见），禁用同质 LLM 自评
-- **Gotcha 显式检测**：报告末尾必须引用 G-001/G-012/G-013/G-014/G-017 状态
-- **入库规则**：仅用户明确说"存知识库"才写盘，否则 `hindsight_retain` 记录教训
+- **SaC 五段式管道**：引擎选择 → Jina 重排 → 规则过滤 → 去重 → 字段提取，搜索全程可编程
+- **5 个核心 Gotcha**：伪独立来源、SEO 农场、时效性、引用不支撑、矛盾静默——每次调研强制检测
+- **中文生态专项**：百度系结果聚类、SerpAPI 百度引擎、软文识别规则（实测沉淀）
+- **确定性验证**：Step 6 用规则复核，不依赖"用 AI 验证 AI"
+- **兼容**：Hermes Agent skill 格式，标准 SKILL.md + references 结构
 
 ## 验证记录
 
-- 2026-08-13 v3.1 全链路实测：优美与崇高（中文语境，触发 G-001/G-012）、AI 营销 Agent 工具对比（n8n vs Zapier 90% 成本差距）
-- 5 个 evals 覆盖：LLM 定价时效性、AI 营销工具利益冲突、项目管理软件 SEO 过滤、财报来源验证、企业 AI 采用率统计溯源
+- 2026-08-13 v3.1 全链路实测：中文语境调研（触发伪独立来源 + SEO 农场识别）、AI 营销工具对比（发现 n8n vs Zapier 90% 成本差距）
+- 5 个 eval 覆盖：LLM 定价时效性、营销工具利益冲突、软件 SEO 过滤、财报来源验证、统计溯源
 
 ## License
 
