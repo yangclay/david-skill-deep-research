@@ -32,7 +32,7 @@ bad_example:
 good_example:
   - "8 pages trace back to 1 primary report (McKinsey 2025)"
   - → 正确：已追溯并标注原始来源
-eval: E-006
+eval: 2
 created: 2026-08-12
 status: active
 behavior_check:

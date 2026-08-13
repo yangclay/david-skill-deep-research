@@ -11,7 +11,9 @@
         "识别并过滤过时信息（如 2024/2025 年数据）",
         "关键定价来自一手来源（官方文档）或至少 2 个独立来源"
       ],
-      "target_gotchas": ["G-013"]
+      "target_gotchas": [
+        "G-013"
+      ]
     },
     {
       "id": 2,
@@ -23,7 +25,10 @@
         "识别 vendor blog 作为利益相关来源",
         "核心结论有独立第三方来源支撑（非仅 vendor blog）"
       ],
-      "target_gotchas": ["G-001", "G-012"]
+      "target_gotchas": [
+        "G-001",
+        "G-012"
+      ]
     },
     {
       "id": 3,
@@ -35,7 +40,9 @@
         "不将 vendor blog 作为核心证据",
         "标注信息来源类型和可信度"
       ],
-      "target_gotchas": ["G-012", "G-022"]
+      "target_gotchas": [
+        "G-012"
+      ]
     },
     {
       "id": 4,
@@ -47,7 +54,9 @@
         "区分'预期 vs 实际'与'来源冲突'",
         "包含 Services、iPhone、Mac 等关键业务板块数据"
       ],
-      "target_gotchas": ["G-017"]
+      "target_gotchas": [
+        "G-017"
+      ]
     },
     {
       "id": 5,
@@ -59,7 +68,9 @@
         "质疑明显夸张的数据（如 >90% adoption）",
         "标注研究方法（survey/telemetry）和样本量"
       ],
-      "target_gotchas": ["G-014", "G-024"]
+      "target_gotchas": [
+        "G-014"
+      ]
     }
   ]
 }

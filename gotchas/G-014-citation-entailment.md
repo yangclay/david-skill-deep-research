@@ -30,5 +30,7 @@ bad_example:
   → 实际：原文说的是 22%，不是 37%
 good_example:
   "Claim: 收入增长 37%（来源：2026-Q1 财报，已验证原文）"
-eval: G-014
+eval: 5
 note: 这是 citation integrity eval 的核心测试点
+created: 2026-08-12
+status: active

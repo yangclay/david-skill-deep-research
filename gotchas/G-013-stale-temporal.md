@@ -34,10 +34,12 @@ bad_example:
 good_example:
   - "截至 2026 年 Q2，CEO 是李四（来源：2026-03 官方公告）"
   - → 正确：已验证时效性并标注时间戳
-eval: G-013
+eval: 1
 note: 这是 temporal eval 的核心测试点
 behavior_check:
   - 报告是否标注了关键事实的发布日期？
   - 报告是否优先选择了近 6 个月的信息？
   - 报告是否识别并处理了时效冲突？
   - 报告是否显式引用了 G-013？
+created: 2026-08-12
+status: active

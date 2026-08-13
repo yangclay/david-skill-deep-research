@@ -88,11 +88,20 @@ DuckDuckGo + Searlo 覆盖率通常够用。但如果结果中**中文内容 < 3
 
 ---
 
-# 中文内容专项（摘自 workflow.md v2）
+# 中文搜索 site: 过滤技巧（补充）
 
----\n
-### 中文搜索 site: 过滤技巧\n- site:zhihu.com — 知乎\n- site:mp.weixin.qq.com — 微信公众号\n- site:juejin.cn — 掘金\n- site:csdn.net — CSDN\n- site:bilibili.com — B站\n- site:xiaohongshu.com — 小红书\n- site:douyin.com — 抖音\n- 企业信息：天眼查/企查查\n- 消费维权：site:tousu.sina.com.cn 黑猫投诉\n
----\n
+### 中文搜索 site: 过滤技巧
+
+- site:zhihu.com — 知乎
+- site:mp.weixin.qq.com — 微信公众号
+- site:juejin.cn — 掘金
+- site:csdn.net — CSDN
+- site:bilibili.com — B站
+- site:xiaohongshu.com — 小红书
+- site:douyin.com — 抖音
+- 企业信息：天眼查/企查查
+- 消费维权：site:tousu.sina.com.cn 黑猫投诉
+
 # 深度调研参考材料
 
 从 SKILL.md 中提取的补充内容。核心七步法在 SKILL.md 中。
@@ -164,7 +173,7 @@ SaC 五段式管道已内建引擎决策和覆盖率判断（见 `sac-search-orc
 
 - SaC 引擎决策自动处理分层，不需要手动选引擎
 - 搜索结果写文件，不全部塞进 context
-- 先综合再展示，给 Clay 看去重后的精华
+- 先综合再展示，给用户看去重后的精华
 
 ---
 
@@ -172,18 +181,20 @@ SaC 五段式管道已内建引擎决策和覆盖率判断（见 `sac-search-orc
 
 | 引擎 | 覆盖 | 免费额度 | 用途 |
 |------|------|----------|------|
-| Tavily research | 内置 | ~1000/月 | 深度综合调研 |
-| Tavily search | 内置 | ~1000/月 | AI 原生快速搜索 |
-| Searlo | REST | $0.30/千次 | Google SERP |
+| Tavily research | 内置 | 1000 credits/月（research 20 RPM） | 深度综合调研 |
+| Tavily search | 内置 | 1000 credits/月（dev 100 RPM） | AI 原生快速搜索 |
+| Searlo | REST | 3000 credits（一次性 90 天） | Google SERP |
 | DuckDuckGo | 内置 | ♾️ | 兜底 |
-| Exa | 原生 | 1000/月 | 语义搜索 |
-| SerpAPI | REST | 100次/月 | 多引擎 |
+| Exa | 原生 | $20 注册 + $10/月（≈1400 次/月） | 语义搜索 |
+| SerpAPI | REST | 250 searches/月（50/h） | 多引擎 |
 | Google Scholar | Skill | ♾️ | 学术 |
 | arXiv | Skill | ♾️ | 预印本 |
 | Scrapling | 本地 | ♾️ | 反爬 |
 | crawl4ai | 本地 | ♾️ | 全站抓取 |
-| TinyFish Search | REST | ♾️ | 实时搜索 |
-| TinyFish Fetch | REST | ♾️ | 浏览器渲染抓取 |
+| TinyFish Search | REST | ♾️（30 RPM） | 实时搜索 |
+| TinyFish Fetch | REST | ♾️（150 URLs/min） | 浏览器渲染抓取 |
+
+> ⚠️ 数据以 sac-search-orchestration.md 的限流速查表为准（2026-08 官方核实）
 
 ---
 
@@ -222,7 +233,7 @@ print(f'Tavily: {used}/{limit} ({used/limit*100:.0f}% used)')
 
 ### Web 页面抓取
 ```bash
-bash /home/clay/.hermes/skills/deep-research/scripts/web-fetch.sh <url> [max_chars]
+bash scripts/web-fetch.sh <url> [max_chars]
 # 或内联 curl（无脚本依赖）
 curl -s --max-time 15 -A "Mozilla/5.0" "<url>"
 ```
@@ -240,8 +251,6 @@ curl -s --max-time 15 -A "Mozilla/5.0" "<url>"
 
 
 ---
-
-# TinyFish API（微信文章抓取）
 
 # TinyFish API — Free Search & Fetch for Research
 
@@ -327,7 +336,7 @@ print(result.results[0].text)
 
 ```bash
 # Get API key: https://agent.tinyfish.ai/api-keys
-export TINYFISH_API_KEY="***"
+export TINYFISH_API_KEY="<从 ~/.hermes/.env 读取>"  # 不要硬编码密钥
 
 # Python SDK
 pip install tinyfish

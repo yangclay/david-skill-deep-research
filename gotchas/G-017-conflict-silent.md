@@ -31,5 +31,7 @@ bad_example:
   → 静默选择，未标注冲突
 good_example:
   "某产品市占率：来源 A（2025 财报）42%，来源 B（2026 行业报告）38%。差异原因：统计口径不同。采用 42% 作为基准，标注 ±4% 区间。"
-eval: G-017
+eval: 4
 note: 这是 conflict eval 的核心测试点，Perplexity 特别强调
+created: 2026-08-12
+status: active
