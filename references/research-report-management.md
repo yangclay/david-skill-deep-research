@@ -1,42 +1,44 @@
 # 调研报告文件管理规范
 
-## 统一存放位置
+## 核心规则（强制）
 
-所有调研报告统一存放在 Obsidian vault 的 `sources/调研/` 目录：
+**入库的唯一前提：用户明确说"存知识库"、"保存到 raw/research/" 或类似表述。**
+
+未指定 → 报告**不写盘**，只在聊天中给核心结论，改用 `hindsight_retain` 记录核心教训。
+
+## 入库位置（用户指定后）
+
+统一写：
 
 ```
-/mnt/d/OneDrive/obsidian-david-knowledge/sources/调研/
+~/wiki/raw/research/主题关键词-YYYY-MM-DD.md
 ```
 
-**不要散落在以下位置：**
-- `~/.hermes/research-output/` — 旧结构，已废弃
-- `~/.hermes/profiles/researcher/workspace/research-output/` — 旧结构，已废弃
-- `~/.hermes/knowledge/research/` — 旧结构，已废弃
+并 sync 到 Obsidian 主 vault（`/mnt/d/OneDrive/obsidian-david-knowledge/`）：
+
+```bash
+rsync -av ~/wiki/raw/research/ "/mnt/d/OneDrive/obsidian-david-knowledge/raw/research/"
+```
 
 ## 命名规范
 
 格式：`主题关键词-YYYY-MM-DD.md`（日期放末尾）
 
 示例：
+- `优美与崇高调研-2026-08-13.md`
 - `AI-Agent框架对比-2026-05-14.md`
-- `Claude-Code-Skill-Creator-2026-05-14.md`
-- `LLM-Wiki知识库最佳实践-2026-05-05.md`
-- `知识库分类方法-2026-05-04.md`
 
 **禁止：**
-- `调研报告.md`（默认名称，无主题）
+- `调研报告.md`（无主题）
 - `2026-05-14-主题.md`（日期在前）
 
-## 迁移旧文件
+## 不进 raw/wiki 的内容
 
-如果发现散落在旧位置的调研报告，统一迁移到 `sources/调研/` 并重命名：
+**判断标准：这份文件 3 个月后还有参考价值吗？没有 → 不进 raw/wiki。**
 
-```bash
-# 检查旧位置
-ls ~/.hermes/research-output/
-ls ~/.hermes/profiles/researcher/workspace/research-output/
-ls ~/.hermes/knowledge/research/
+- ❌ 测试报告、实验记录、验证过程
+- ❌ 中间产物、进度跟踪、日志文件
+- ❌ 我自主生成的调研报告（未经用户指定）
+- ❌ 纯过程性描述（"做了什么"而非"学到了什么"）
 
-# 迁移示例
-mv ~/.hermes/research-output/旧文件.md /mnt/d/OneDrive/obsidian-david-knowledge/sources/调研/主题-YYYY-MM-DD.md
-```
+以上一律改用 `hindsight_retain` 记录核心教训。

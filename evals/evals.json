@@ -1,0 +1,65 @@
+{
+  "skill_name": "deep-research",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "调研 2026 年 LLM API 定价对比，包括 GPT-4o、Claude 3.5 Sonnet、DeepSeek V4 的输入输出价格",
+      "expected_output": "包含各模型最新定价，标注来源和日期，识别过时信息",
+      "expectations": [
+        "报告包含 GPT-4o、Claude、DeepSeek 至少 2 个模型的定价",
+        "定价数据标注来源 URL 和日期",
+        "识别并过滤过时信息（如 2024/2025 年数据）",
+        "关键定价来自一手来源（官方文档）或至少 2 个独立来源"
+      ],
+      "target_gotchas": ["G-013"]
+    },
+    {
+      "id": 2,
+      "prompt": "调研 AI 营销工具市场，比较 HubSpot、Jasper、SurferSEO 的功能和定价",
+      "expected_output": "包含功能对比表、定价信息，识别 vendor blog 利益冲突",
+      "expectations": [
+        "报告包含至少 3 个工具的对比",
+        "标注每个工具的核心功能和定价",
+        "识别 vendor blog 作为利益相关来源",
+        "核心结论有独立第三方来源支撑（非仅 vendor blog）"
+      ],
+      "target_gotchas": ["G-001", "G-012"]
+    },
+    {
+      "id": 3,
+      "prompt": "调研最佳项目管理软件 2026，比较 ClickUp、Asana、Monday 的优缺点",
+      "expected_output": "包含真实评测信息，过滤 SEO 内容农场",
+      "expectations": [
+        "报告包含至少 3 个工具的对比",
+        "区分独立评测（PCMag、G2）和 vendor blog",
+        "不将 vendor blog 作为核心证据",
+        "标注信息来源类型和可信度"
+      ],
+      "target_gotchas": ["G-012", "G-022"]
+    },
+    {
+      "id": 4,
+      "prompt": "调研 Apple Q3 2026 财报数据，包括 revenue、EPS、各业务板块表现",
+      "expected_output": "从官方新闻稿和 SEC filing 验证数据，标注预期 vs 实际差异",
+      "expectations": [
+        "关键财务数据来自 Apple 官方新闻稿或 SEC filing",
+        "标注各数据的来源 URL",
+        "区分'预期 vs 实际'与'来源冲突'",
+        "包含 Services、iPhone、Mac 等关键业务板块数据"
+      ],
+      "target_gotchas": ["G-017"]
+    },
+    {
+      "id": 5,
+      "prompt": "调研 2026 年企业 AI 采用率统计数据，包括 McKinsey、Deloitte 等报告数据",
+      "expected_output": "验证原始报告，解释数字差异原因，质疑可疑数据",
+      "expectations": [
+        "关键 statistic 追溯到原始报告（McKinsey/Deloitte/Gartner）",
+        "解释不同来源数字差异的原因",
+        "质疑明显夸张的数据（如 >90% adoption）",
+        "标注研究方法（survey/telemetry）和样本量"
+      ],
+      "target_gotchas": ["G-014", "G-024"]
+    }
+  ]
+}

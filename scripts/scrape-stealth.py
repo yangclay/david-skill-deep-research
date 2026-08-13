@@ -1,6 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """scrape-stealth.py — Scrapling 反爬抓取 wrapper
-用法：python3 scrape-stealth.py <url> [--mode stealth|dynamic|http] [--max-chars N]
+用法：/usr/bin/python3 scrape-stealth.py <url> [--mode stealth|dynamic|http] [--max-chars N]
+
+⚠️ 必须用 /usr/bin/python3（3.12）：Scrapling 装在 3.12 的 site-packages。
+   如果 `python3` 指向其他版本（如 Hermes venv 3.11），lxml etree 会导入失败。
+   环境变量：PYTHONPATH=$HOME/.local/lib/python3.12/site-packages
 
 模式：
   http（默认）: 快速 HTTP + TLS 指纹伪装
