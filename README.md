@@ -24,32 +24,23 @@ AI 调研最常见的失败模式不是"搜不到"，而是**搜到了但不可�
 ## 工作流
 
 ```mermaid
-flowchart LR
+graph LR
     S1["Step 1 拆解<br/>Decompose"] --> S2["Step 2 SaC 编排<br/>SaC Orchestration"]
     S2 --> S3["Step 3 差距分析<br/>Gap Analysis"]
-    S3 -->|"证据充分 ✓"| S4["Step 4 验证<br/>Verification"]
+    S3 --> S4["Step 4 验证<br/>Verification"]
     S4 --> S5["Step 5 报告<br/>Report"]
     S5 --> S6["Step 6 独立验证<br/>Independent Verification"]
     S6 --> S7["Step 7 策略反馈<br/>Strategy Feedback"]
 
-    subgraph PIPE["Step 2 内部 · SaC Pipeline"]
-        direction LR
+    subgraph PIPE["Step 2 内部 SaC Pipeline"]
         E1["引擎选择<br/>Engine"] --> E2["Jina 重排<br/>Rerank"]
-        E2 --> E3["规则过滤<br/>Rule Filter"] --> E4["去重<br/>Dedupe"]
+        E2 --> E3["规则过滤<br/>Rule Filter"]
+        E3 --> E4["去重<br/>Dedupe"]
         E4 --> E5["字段提取<br/>parse_field"]
     end
 
     S2 -. "展开" .-> PIPE
-    S3 -. "缺口 ✗ 补搜 ≤3轮" .-> S2
-
-    style S1 fill:#1a3a5c,stroke:#4a90d9,color:#fff
-    style S2 fill:#1a3a5c,stroke:#4a90d9,color:#fff
-    style S3 fill:#5c3a1a,stroke:#d9a04a,color:#fff
-    style S4 fill:#1a3a5c,stroke:#4a90d9,color:#fff
-    style S5 fill:#1a3a5c,stroke:#4a90d9,color:#fff
-    style S6 fill:#3a1a5c,stroke:#a04ad9,color:#fff
-    style S7 fill:#3a1a5c,stroke:#a04ad9,color:#fff
-    style PIPE fill:#1c4a3a,stroke:#4ac9a0,color:#fff
+    S3 -. "缺口 补搜" .-> S2
 ```
 
 核心：**搜索是可编程的**。用 `execute_code` 编排完整搜索管道（fanout → search → rerank → dedupe），只把压缩后的 top-N 结果带回上下文。
