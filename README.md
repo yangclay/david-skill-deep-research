@@ -24,7 +24,7 @@ AI 调研最常见的失败模式不是"搜不到"，而是**搜到了但不可�
 ## 工作流
 
 ```mermaid
-graph LR
+graph TD
     S1["Step 1 拆解<br/>Decompose"] --> S2["Step 2 SaC 编排<br/>SaC Orchestration"]
     S2 --> S3["Step 3 差距分析<br/>Gap Analysis"]
     S3 --> S4["Step 4 验证<br/>Verification"]
