@@ -27,11 +27,11 @@ correct_action:
   - 输出 "8 pages trace back to 1 primary report"
   - **必须显式引用** G-001
 bad_example:
-  - "8 sources report 42%"
-  - → 错误：未追溯引用链
+  - "中文 9 条结果都支持同一说法，视为 9 个独立来源"
+  - → 错误：未追溯引用链（2026-08-13 优美与崇高实测）
 good_example:
-  - "8 pages trace back to 1 primary report (McKinsey 2025)"
-  - → 正确：已追溯并标注原始来源
+  - "中文 9 条中百度系（cp.baidu/easylearn/wenku/baike）为同家族，独立中文源实际仅 ~3 个"
+  - → 正确：已追溯并标注 source family（2026-08-13 优美与崇高实测）
 eval: 2
 created: 2026-08-12
 status: active

@@ -26,11 +26,11 @@ rsync -av ~/wiki/raw/research/ "/mnt/d/OneDrive/obsidian-david-knowledge/raw/res
 
 示例：
 - `优美与崇高调研-2026-08-13.md`
-- `AI-Agent框架对比-2026-05-14.md`
+- `AI营销Agent工具对比-2026-08-13.md`
 
 **禁止：**
 - `调研报告.md`（无主题）
-- `2026-05-14-主题.md`（日期在前）
+- `2026-08-13-主题.md`（日期在前）
 
 ## 不进 raw/wiki 的内容
 

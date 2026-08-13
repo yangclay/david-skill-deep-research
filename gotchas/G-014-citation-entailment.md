@@ -26,10 +26,10 @@ correct_action:
   - 不支持的 citation 标注为"弱支撑"
   - 无法验证的 citation 标注为"未验证"
 bad_example:
-  "Claim: 收入增长 37%，Citation: 某文章说收入增长"
-  → 实际：原文说的是 22%，不是 37%
+  "Claim: 伯克认为崇高源于愉悦，Citation: 百度百科'崇高'条目"
+  → 实际：伯克 1757 原文认为崇高源于恐惧（自我保存），与愉悦对立
 good_example:
-  "Claim: 收入增长 37%（来源：2026-Q1 财报，已验证原文）"
+  "Claim: 伯克 1757 首次系统区分崇高与优美（来源：archive.org 原文全文，已抓取验证）"
 eval: 5
 note: 这是 citation integrity eval 的核心测试点
 created: 2026-08-12
