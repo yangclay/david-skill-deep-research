@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""crawl_site.py — crawl4ai wrapper for deep-research
+"""crawl_site.py — crawl4ai wrapper for orion-research
 用法：
   python3 crawl_site.py <url> [options]
 
@@ -242,7 +242,7 @@ async def crawl_sitemap(base_url: str, max_pages: int = 50, js: bool = False,
 
 
 def main():
-    parser = argparse.ArgumentParser(description="crawl4ai wrapper for deep-research")
+    parser = argparse.ArgumentParser(description="crawl4ai wrapper for orion-research")
     parser.add_argument("url", help="Target URL")
     parser.add_argument("--mode", choices=["single", "multi", "sitemap"], default="single")
     parser.add_argument("--max-pages", type=int, default=10)

@@ -1,7 +1,7 @@
 # 用户调研模式：差距分析（Gap-vs-Existing Pattern）
 
 > 来源：2026-05-14 Claude Code skill creator 调研
-> 适配：deep-research skill v3.1（Step 1 识别 → Step 3 补证据 → Step 5 落结论）
+> 适配：orion-research skill v3.1（Step 1 识别 → Step 3 补证据 → Step 5 落结论）
 
 ## 模式描述
 

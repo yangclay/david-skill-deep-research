@@ -1,9 +1,9 @@
-# Deep Research Skill
+# Orion Research（猎真）
 
-> **深度调研技能：多源验证、可追溯、反幻觉。** 当问题需要跨来源调查、拆解子问题、验证关键结论、处理来源冲突时使用。
+> **猎真（Orion Research）——深度调研技能：多源验证、可追溯、反幻觉。** 当问题需要跨来源调查、拆解子问题、验证关键结论、处理来源冲突时使用。
 
-[![Version](https://img.shields.io/badge/version-v3.1.0-blue)](https://github.com/yangclay/david-skill-deep-research)
-[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](https://github.com/yangclay/david-skill-deep-research/blob/master/LICENSE)
+[![Version](https://img.shields.io/badge/version-v3.1.0-blue)](https://github.com/yangclay/orion-research)
+[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](https://github.com/yangclay/orion-research/blob/master/LICENSE)
 
 用于 [Hermes Agent](https://github.com/NousResearch/hermes-agent) 的生产级深度调研技能（Agent Skill）。
 
@@ -37,13 +37,13 @@ Step 1 拆解 → Step 2 SaC 编排 → Step 3 Gap Analysis → Step 4 验证 �
 ### 方式一：clone 到 Hermes profile（推荐）
 
 ```bash
-git clone https://github.com/yangclay/david-skill-deep-research.git \
-  ~/.hermes/profiles/<profile>/skills/deep-research
+git clone https://github.com/yangclay/orion-research.git \
+  ~/.hermes/profiles/<profile>/skills/orion-research
 ```
 
 ### 方式二：直接复制
 
-将 `SKILL.md` + `references/` + `scripts/` + `gotchas/` + `evals/` 复制到 `~/.hermes/profiles/<profile>/skills/deep-research/`。
+将 `SKILL.md` + `references/` + `scripts/` + `gotchas/` + `evals/` 复制到 `~/.hermes/profiles/<profile>/skills/orion-research/`。
 
 ### 依赖
 
@@ -53,7 +53,7 @@ git clone https://github.com/yangclay/david-skill-deep-research.git \
 ## 技能结构
 
 ```
-deep-research/
+orion-research/
 ├── SKILL.md                        # 核心定义（7 步工作流 + ReAct/CodeAct 双模式）
 ├── references/
 │   ├── sac-search-orchestration.md # SaC 五段式管道模板（核心，Step 2 用）
@@ -62,7 +62,7 @@ deep-research/
 │   ├── failure-handling.md         # F1-F7 故障处理
 │   ├── tool-reference.md           # 中文调研专项 + 工具参考
 │   ├── research-report-management.md # 入库规则（仅用户明确指定时写盘）
-│   └── deep-research-user-patterns.md # 差距分析模式识别
+│   └── orion-research-user-patterns.md # 差距分析模式识别
 ├── scripts/
 │   ├── web-fetch.sh                # curl 抓单页
 │   ├── scrape-stealth.py           # 反爬三模式（http/stealth/dynamic）

@@ -1,5 +1,5 @@
 ---
-name: deep-research
+name: orion-research
 description: >
   当问题需要跨来源调查、拆解子问题、验证结论、处理冲突时使用。
   触发词：深度调研、调研、研究、investigate、research。
@@ -10,7 +10,7 @@ description: >
 license: MIT
 metadata:
   hermes:
-    tags: [research, deep-research, multi-source, verification]
+    tags: [research, orion-research, multi-source, verification]
     related_skills: [browser-act, web-llm-caller]
   version: 3.1.0
 ---
@@ -59,7 +59,7 @@ metadata:
 ### Step 1: 拆解 + Query Rephrasing
 
 - 将问题拆解为 2-5 个子问题，按信息增益排序
-- **差距型调研识别**：问题含"区别/优势/提升/现成方案/本质"信号 → 固定加入子问题"现有方案已经能做什么？X 的真正增量是什么？"（见 references/deep-research-user-patterns.md）
+- **差距型调研识别**：问题含"区别/优势/提升/现成方案/本质"信号 → 固定加入子问题"现有方案已经能做什么？X 的真正增量是什么？"（见 references/orion-research-user-patterns.md）
 - 每个子问题生成 1-3 个查询变体（同义/英文/加限定词）
 - **强制输出（写进报告"调研过程"）**：`原查询 → 变体1 / 变体2` 对照表，不是一句话带过。缺对照表 = 报告不达标
 - 输出：子问题列表 + 查询组合（含变体）
@@ -89,7 +89,7 @@ metadata:
 - 评估 top-N 结果质量：
   - 所有子问题有可靠证据 → 停止，进入 Step 4
   - 存在缺口 → 基于缺口定向补搜（最多 3 轮）
-  - **对比类缺口**：差距型调研只有 X 的介绍、缺现有方案对比 → 补搜"X vs Y"/"X alternative"（见 references/deep-research-user-patterns.md）
+  - **对比类缺口**：差距型调研只有 X 的介绍、缺现有方案对比 → 补搜"X vs Y"/"X alternative"（见 references/orion-research-user-patterns.md）
 - **不要盲目搜满固定轮数** — 质量够就停，省 token 省 RPM
 
 🔴 **CHECKPOINT（强制）**：Step 3 结束后，必须显式评估「每个子问题是否有 A/B 级证据支撑」。有缺口 → 回到 Step 2 换引擎补搜；全部有证据 → 才允许进入 Step 4。不得跳过此判断直接写报告。
@@ -108,7 +108,7 @@ metadata:
 ### Step 5: 报告
 
 - 完整报告 = 核心结论（带可信度）+ 证据 + 来源列表（每行含可点击 URL）+ 冲突记录 + 分析过程
-- **差距型调研**：核心结论第一条必须是 X 的真正价值（解决的痛点，非功能列表）+ 与现有方案的差距（见 references/deep-research-user-patterns.md）
+- **差距型调研**：核心结论第一条必须是 X 的真正价值（解决的痛点，非功能列表）+ 与现有方案的差距（见 references/orion-research-user-patterns.md）
 - 必须包含 **Gotcha 检测** 章节（显式引用 G-001/G-012/G-013/G-014/G-017 状态）
 - **入库规则（强制）：写 `~/wiki/raw/research/` 的唯一前提是用户明确说"存知识库"/"保存到 raw/research/"**。未指定 → 报告不写盘、不 sync Obsidian，只在聊天给核心结论，改用 `hindsight_retain` 记录核心教训
 - 用户指定入库时 → 写 `~/wiki/raw/research/主题-YYYY-MM-DD.md` 并 sync 到 Obsidian（见 references/research-report-management.md）
@@ -178,6 +178,6 @@ metadata:
 - [SaC 搜索编排模板](references/sac-search-orchestration.md) ← 核心，Step 2 用
 - [来源可信度评估](references/source-evaluation.md)
 - [报告模板](references/reporting.md)
-- [用户调研模式（差距分析）](references/deep-research-user-patterns.md) ← Step 1/3/5 用
+- [用户调研模式（差距分析）](references/orion-research-user-patterns.md) ← Step 1/3/5 用
 - [故障处理 F1-F7](references/failure-handling.md) ← Step 2 工具失败时用
 - [中文调研专项 + 工具参考](references/tool-reference.md) ← 中文生态/辅助脚本
