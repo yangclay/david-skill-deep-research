@@ -7,7 +7,7 @@ metadata:
   hermes:
     tags: [research, orion-research, multi-source, verification]
     related_skills: [wechat-article-reader, web-llm-caller]
-  version: 3.4.0
+  version: 3.4.1
 ---
 
 # Deep-Research Skill v3.4
@@ -45,6 +45,9 @@ metadata:
 
 ## 工作流（7 步）= 深度通道
 （同 v3.1：拆解 → 搜索编排 → 动态决策 → 验证 → 报告 → 独立复核 → 策略反馈）
+
+**Step 7 策略反馈 · 补充记录类型（v3.4.1）**——除「引擎-子问题」经验外，第三类必记：
+3. **标准误判**：用户对报告的反应与本 skill 判定相反时（本 skill 给了高可信度/判 PASS，用户打回；或反之低判被用户认可）→ hindsight 记 `[场景] 判X被用户判Y，分歧点=Z`。这是评估器调优的原材料——不改当下，攒够 ≥2 次同型分歧才动判据（寄生环，验证后固化）。
 
 ## 核心 Gotchas
 （同 v3.1：G-001 伪独立来源、G-012 SEO 农场、G-013 时效性、G-014 Citation 支撑、G-017 冲突静默）
