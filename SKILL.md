@@ -44,13 +44,16 @@ metadata:
 **升级规则**：快速通道跑完发现来源打架或答案牵动决策 → 立即转深度，已查结果作为子问题输入不浪费。引擎选择两通道都照 SaC 决策树（单一权威源，此处不重复）。
 
 ## 工作流（7 步）= 深度通道
-（同 v3.1：拆解 → 搜索编排 → 动态决策 → 验证 → 报告 → 独立复核 → 策略反馈）
+
+**进入深度通道前必读 [references/workflow.md](references/workflow.md)**——七步完整操作定义（Step 1 拆解→Step 7 策略反馈，含 🔴 CHECKPOINT、Step 6 确定性复核规则表、反模式清单）全在该文件。
+
+**快速通道输出规范**（不走 7 步，但证据链承诺不变）：直答 = 结论 + 来源 URL（1-3 条），标注时效；无 URL 判不达标。
 
 **Step 7 策略反馈 · 补充记录类型（v3.4.1）**——除「引擎-子问题」经验外，第三类必记：
 3. **标准误判**：用户对报告的反应与本 skill 判定相反时（本 skill 给了高可信度/判 PASS，用户打回；或反之低判被用户认可）→ hindsight 记 `[场景] 判X被用户判Y，分歧点=Z`。这是评估器调优的原材料——不改当下，攒够 ≥2 次同型分歧才动判据（寄生环，验证后固化）。
 
 ## 核心 Gotchas
-（同 v3.1：G-001 伪独立来源、G-012 SEO 农场、G-013 时效性、G-014 Citation 支撑、G-017 冲突静默）
+G-001 伪独立来源（追溯引用链按 source family 计数）｜G-012 SEO 农场（标题党/模板化识别，优先一手来源）｜G-013 时效性过时（动态事实查发布日期标时间戳）｜G-014 Citation 支撑失败（抓原文验证 entailment）｜G-017 冲突静默（矛盾必须分类并给出判断）。检测方法详见 workflow.md Step 4 与 source-evaluation.md。
 
 ## 输出契约
 1. 核心结论 3-5 条（每条带可信度 A/B/C/D）
@@ -59,6 +62,7 @@ metadata:
 4. 矛盾记录
 
 ## 参考文档
+- [深度通道七步工作流](references/workflow.md) ← 深度通道必读
 - [SaC 搜索编排模板](references/sac-search-orchestration.md)
 - [来源可信度评估](references/source-evaluation.md)
 - [报告模板](references/reporting.md)

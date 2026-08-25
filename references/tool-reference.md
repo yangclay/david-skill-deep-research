@@ -6,7 +6,7 @@
 
 ### 第一轮：通用搜索（SaC 引擎决策自动完成）
 
-DuckDuckGo + Searlo 覆盖率通常够用。但如果结果中**中文内容 < 30%** 或 **核心问题无直接回答**，进入第二轮。
+Searlo → Serper（Google SERP 质量层）为主力，DDG 仅兜底（2026-08-24 质量优先定案）。但如果结果中**中文内容 < 30%** 或 **核心问题无直接回答**，进入第二轮。
 
 ### 第二轮：中文平台专项补充
 
@@ -131,15 +131,17 @@ SaC 五段式管道已内建引擎决策和覆盖率判断（见 `sac-search-orc
 | 开源工具对比 | GitHub API |
 | 社区讨论 | HN Algolia + Reddit JSON |
 | 反爬/Cloudflare 页面 | Scrapling 或 TinyFish Fetch |
+| 验证码墙/强反爬（微信/知乎/小红书/Turnstile） | cloak-fetch.py（CloakBrowser，hermes-agent venv python3） |
 | 多页爬取/全站抓取 | crawl4ai |
 | 语义相似内容 | Exa |
 | 动态/实时内容 | TinyFish Search |
 
 ### 中文生态覆盖
 
-- **微信公众号**：搜索得到 URL 后 web-fetch 抓正文
-- **知乎 / 掘金**：SerpAPI Google `site:zhihu.com` / `site:juejin.cn`
-- **B站**：`site:bilibili.com` 搜索视频和简介
+- **知乎全链**：搜索用 Searlo `site:zhihu.com`（先烧）→ Serper 接棒 → SerpAPI 百度兜底；**抓正文用 cloak-fetch.py**（CloakBrowser 绕验证码墙，`PYTHONPATH=$HOME/.local/lib/python3.12/site-packages /usr/bin/python3 scripts/cloak-fetch.py <url>`）——搜索+抓取两段拼成完整知乎通道
+- **微信公众号**：Serper `site:mp.weixin.qq.com` 搜索得 URL 后 web-fetch 抓正文；反爬时 wechat-article-reader skill（CloakBrowser）
+- **知乎 / 掘金 / B站**：Serper `site:zhihu.com / site:juejin.cn / site:bilibili.com`
+- **百度系内容（文库/百科/贴吧/黑猫）**：SerpAPI 百度引擎（专属场景，月 250 次额度留给它）
 - **Hacker News**：`curl -s "https://hn.algolia.com/api/v1/search?query=关键词&tags=story&hitsPerPage=5"`
 - **Reddit**：`curl -s -H "User-Agent: research-bot" "https://www.reddit.com/search.json?q=关键词&limit=5&sort=relevance"`
 
@@ -157,6 +159,7 @@ SaC 五段式管道已内建引擎决策和覆盖率判断（见 `sac-search-orc
 
 常见障碍：
 - 反爬/Cloudflare → scrape-stealth.py
+- 验证码墙/强反爬（微信/Turnstile/中文平台） → cloak-fetch.py（CloakBrowser）
 - SPA/JS 渲染 → scrape-stealth.py --mode dynamic
 - web_fetch 403 → scrape-stealth.py
 - 搜索被限 → 切换引擎
@@ -179,7 +182,8 @@ SaC 五段式管道已内建引擎决策和覆盖率判断（见 `sac-search-orc
 |------|------|----------|------|
 | Tavily research | 内置 | 1000 credits/月（research 20 RPM） | 深度综合调研 |
 | Tavily search | 内置 | 1000 credits/月（dev 100 RPM） | AI 原生快速搜索 |
-| Searlo | REST | 3000 credits（一次性 90 天） | Google SERP |
+| Searlo | REST | 3000 credits（一次性 90 天，先烧） | Google SERP 主力 |
+| Serper | REST | 2500 次（注册一次性赠送，50 QPS） | Google SERP 接棒 + 中文 site: 主力 |
 | DuckDuckGo | 内置 | ♾️ | 兜底 |
 | Exa | 原生 | $20 注册 + $10/月（≈1400 次/月） | 语义搜索 |
 | SerpAPI | REST | 250 searches/月（50/h） | 多引擎 |

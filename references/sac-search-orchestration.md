@@ -22,28 +22,31 @@
 
 | API | 免费额度 | **速率限制** | 安全间隔 | 用途 |
 |-----|---------|------------|---------|------|
-| **Tavily** | 1000 credits/月（basic=1，advanced=2） | **dev: 100 RPM**；research: 20 RPM | ≥1s | 核心子问题深度搜索（AI 答案） |
+| **Tavily** | 1000 credits/月（basic=1，advanced=2） | **dev: 100 RPM**；research: 20 RPM | ≥1s | 核心子问题深度搜索（**只用 advanced+include_answer**；2026-08-24 对拍：basic 模式与 DDG top-5 完全同源，烧 credits 纯浪费） |
 | **SerpAPI** | 250 searches/月 | **free: 50/小时** | 串行 | 中文生态/多引擎 |
 | **Exa** | $20 注册 + $10/月（≈1400 次/月） | **/search: 10 QPS**（600 RPM） | 不用管 | 语义相似/论文 |
-| **Searlo** | 3000 credits（一次性，90 天有效） | Pro: 300 req/min | 不用管 | Google SERP |
-| **TinyFish** | Search/Fetch 永久免费 | **Search: 30 RPM**，Fetch: 150 URLs/min | ≥2s | 第二免费源 |
+| **Searlo** | 3000 credits（一次性，90 天有效） | Pro: 300 req/min | 不用管 | Google SERP 主力（易腐品先烧；实测支持中文/site:/gl/hl，与 Serper 同源） |
+| **Serper** | 2500 次（注册一次性赠送，不过期） | **50 QPS**，1-2s 响应 | 不用管 | Google SERP 接棒（Searlo 耗尽/到期后转正；num=20 单次翻倍 + tbs 时间窗） |
+| **TinyFish** | Search/Fetch 永久免费 | **Search: 30 RPM**，Fetch: 150 URLs/min | ≥2s | 免费质量层（2026-08-24 对拍：英文 top5 与 Serper 完全一致、中文 4/5 重叠，实为 Google 同源质量；30 RPM 慢、无 num/tbs 进阶参数；实时内容最优：reuters/techcrunch > DDG reddit/youtube） |
 | **Jina Rerank** | 1000 万 token（非商用） | **100 RPM，100K TPM，2 并发** | ≥0.6s + ≤2 并发 | 相关性重排 |
-| **web_search**（内置 DDG） | 无限免费 | 无公布限流 | 不用管 | 默认兜底 |
+| **web_search**（内置 DDG） | 无限免费 | 无公布限流 | 不用管 | 兜底（质量不足，2026-08-24 降级） |
 
 **调度铁律：**
 1. **Hermes execute_code 总限流 20 RPM（Agnes）**——所有 API 调用 + 工具调用共享，`time.sleep(3)` 不可省
 2. **同一 API 绝不并发**（Tavily/SerpAPI 单线程串行）
 3. **Jina rerank 一次调研只调 1-2 次**——全部结果合并后一次性重排，不是每个查询重排
-4. **免费源先上**（web_search/TinyFish/Exa），质量源（Tavily/SerpAPI）按子问题特性按需用
+4. **质量优先**（2026-08-24 全引擎对拍定案）：默认第一层 = Searlo（易腐先烧）→ 耗尽后 TinyFish（免费 Google 质量，日常）+ Serper（进阶参数场景：num=20/tbs/批量 fanout 高并发）；DDG 兜底；TinyFish 兼任实时内容首选
+5. **Tavily 只用 advanced**（2026-08-24 对拍：basic 模式与 DDG top-5 完全同源，烧 credits 纯浪费；价值只在 advanced+include_answer 的 AI 答案）
 
 ## 五段式管道（引擎选择是"决策"不是"顺序"）
 
 ```
 Step 2a: 引擎选择（按子问题特性决策）
   ├─ 核心子问题（高信息增益，要 AI 答案）→ Tavily advanced
-  ├─ 一般子问题（覆盖为主）            → web_search（免费）
-  ├─ 应用/趋势/当代艺术/体验类          → Tavily（实测 2026-08-13：web_search top-10 命中 0 条）
-  ├─ 中文生态（知乎/公众号/天眼查）     → SerpAPI 百度 + site: 过滤
+  ├─ 一般子问题（默认）              → Searlo 先烧（易腐）→ 耗尽后 TinyFish 日常 / Serper 进阶（真 Google SERP）；DDG 仅兜底
+  ├─ Google SERP（要真 Google 排名/英文深度覆盖）→ Searlo（credits 到期前先烧）→ Serper（2500 接棒；num=20 单次翻倍 + tbs 时间窗）
+  ├─ 应用/趋势/当代艺术/体验类          → Tavily（实测 2026-08-13：web_search top-10 假命中）
+  ├─ 中文生态（知乎/公众号/小红书/B站） → Searlo site: 先烧（2026-08-24 实测：中文+site:+gl/hl 全透传，与 Serper 结果同源）→ Serper site: 接棒；百度系内容才 SerpAPI 百度
   ├─ 语义相似（找相关/论文）           → Exa
   ├─ 学术专项                         → Scholar / arXiv
   └─ 覆盖率检查：不足 → 升级到下一成本层
@@ -69,15 +72,15 @@ Step 2d: dedupe + top-N 压缩输出
 Step 2e: parse_field 结构化字段提取（对 top-3 抓原文 → 抽结构化字段）
 ```
 
-**关键区别（vs 早期 smart-search）：** smart-search 是固定顺序逐层升级（不管子问题特性），五段式让模型根据子问题特性选引擎组合——核心问题用 Tavily，一般问题停免费层，中文用 SerpAPI。**按需组合，不是全量堆叠。**
+**关键区别（vs 早期 smart-search）：** smart-search 是固定顺序逐层升级（不管子问题特性），五段式让模型根据子问题特性选引擎组合——核心问题用 Tavily，一般问题走 Google SERP 质量层（Searlo→Serper），中文用 Serper site:。**按需组合，不是全量堆叠。**
 
 ## 工具选择矩阵（按功能和使用场景调用，不是"源不足才用"）
 
 | 场景 | 首选 | 说明 |
 |------|------|------|
-| **SaC 批量 fanout + rerank**（深度调研核心） | `execute_code` + `web_search` + Jina | 一次编排多查询，Jina 重排，只回 top-N |
+| **SaC 批量 fanout + rerank**（深度调研核心） | `execute_code` + Searlo/Serper + Jina | 一次编排多查询，Jina 重排，只回 top-N |
 | **核心子问题深度搜索**（要 AI 答案） | 内联 Tavily API（`search_depth=advanced` + `include_answer`） | 见下方"Tavily 内联模板" |
-| **一般子问题搜索**（覆盖为主） | `web_search`（免费无限） | 默认 |
+| **一般子问题搜索**（默认） | Searlo → Serper（内联 REST） | 质量优先；credits 耗尽降 web_search(DDG) 兜底 |
 | **应用/趋势/当代艺术/体验类** | 内联 Tavily API | 实测 web_search 命中率低（2026-08-13 优美与崇高） |
 | **快速抓单页** | `web-fetch.sh` 或内联 curl | 干净解析，无 JS 渲染需求 |
 | **反爬/Cloudflare 页面** | `scrape-stealth.py --mode http/stealth` | http/stealth/dynamic 三模式全通 |
@@ -112,8 +115,8 @@ MAIN_QUERY = "<主问题描述>"
 # 每个子问题标注引擎：核心→tavily，一般→web_search，中文→serpapi，语义→exa
 queries = [
     ("子问题1", "tavily",   ["query 1a", "query 1b 变体"]),   # 核心：Tavily 要 AI 答案
-    ("子问题2", "web_search", ["query 2a"]),                    # 一般：免费层
-    ("子问题3", "serpapi_baidu", ["中文查询"]),                 # 中文：SerpAPI 百度
+    ("子问题2", "searlo", ["english query 2a"]),                # 一般：Searlo 先烧（质量优先默认层）
+    ("子问题3", "serper", ["site:zhihu.com 中文查询", "查询 site:mp.weixin.qq.com"]),  # 中文/Google SERP：Serper
 ]
 
 raw = []
@@ -121,7 +124,23 @@ for sub, engine, qs in queries:
     for q in qs:
         time.sleep(3)  # 铁律：Agnes 20 RPM，不可省
         try:
-            if engine == "web_search":
+            if engine == "serper":  # Google SERP + 中文 site: 主力（2500 次，50 QPS）
+                payload = json.dumps({"q": q, "gl": "cn", "hl": "zh-cn", "num": 20}).encode()
+                req = urllib.request.Request("https://google.serper.dev/search", data=payload,
+                    headers={"X-API-KEY": get_key("SERPER_API_KEY"),
+                             "Content-Type": "application/json"}, method="POST")
+                d = json.loads(urllib.request.urlopen(req, timeout=15).read())
+                items = [{"title": x.get("title",""), "url": x.get("link",""),
+                          "description": x.get("snippet","")} for x in d.get("organic",[])]
+            elif engine == "searlo":  # Google SERP 默认第一层（3000 credits 90 天到期，先烧）
+                # 坑（2026-08-24 实测）：Searlo 拦 urllib 默认 UA（HTTP 403）——必须走 curl
+                from urllib.parse import quote
+                q_enc = quote(q, safe='')
+                sresp = terminal(f"curl -s --max-time 15 'https://api.searlo.tech/api/v1/search/web?q={q_enc}&limit=10&gl=us' -H 'x-api-key: {get_key(\"SEARLO_API_KEY\")}'", timeout=20).get("output","")
+                d = json.loads(sresp)
+                items = [{"title": x.get("title",""), "url": x.get("link",""),
+                          "description": x.get("snippet","")} for x in (d.get("results") or d.get("organic") or [])]
+            elif engine == "web_search":
                 r = web_search(q, limit=5)
                 items = r.get("data", {}).get("web", [])
             elif engine == "tavily":
@@ -167,7 +186,7 @@ payload = json.dumps({"model": "jina-reranker-v2-base-multilingual",
 with open("/tmp/jina_payload.json", "w") as f:
     f.write(payload)
 cmd = f"""curl -s -X POST 'https://api.jina.ai/v1/rerank' \
-  -H "Authorization: Bearer {get_key('JINA_API_KEY')}" \
+  -H "Authorization: Bearer ${JINA_API_KEY}" \
   -H "Content-Type: application/json" \
   -d @/tmp/jina_payload.json"""
 out = terminal(cmd, timeout=30).get("output", "")
@@ -202,7 +221,7 @@ print(json.dumps(top, ensure_ascii=False, indent=1))
 ## 使用说明
 
 1. **每次执行前**：把 `MAIN_QUERY` 和 `queries`（含引擎标注）换成实际调研问题
-2. **引擎标注**：核心子问题 → `tavily`，一般 → `web_search`，中文 → `serpapi_baidu`，语义 → `exa`
+2. **引擎标注**：核心 → `tavily`，一般 → `searlo`（先烧）→ `serper`，中文 → `serper` site:，百度系 → `serpapi_baidu`，语义 → `exa`，兜底 → `web_search`
 3. **查询数量**：控制在 ≤15 个（execute_code 5 分钟超时 + 50 次工具调用上限）
 4. **rerank 失败兜底**：Jina 挂了就按原始顺序返回（脚本内 try/except）
 5. **相关性阈值**：0.3 默认，结果太少降到 0.2，太多升到 0.4
