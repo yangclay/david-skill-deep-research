@@ -12,6 +12,8 @@
 
 ## Step 2: SaC 编排搜索（核心）
 
+- **蜂群分支**（SKILL.md「蜂群编排」适用判据三条全中时）：Step 1 的子问题经 `delegate_task(tasks=[...])` 并行派发 leaf 子代理查证，双层产出=证据层落盘（swarm/<task>/subQ<n>-sources.md）+决策层 output_schema 回传；引擎编排仍以 sac-search-orchestration.md 为单一权威源，由父脑写进各子代理 context。子代理返回后跳到 Step 3 评估其决策层结果。
+
 - 用**代码执行环境**写一段 Python 编排搜索 pipeline
 - **五段式管道**（模板见 `sac-search-orchestration.md`）：
   - **2a 引擎选择**：按子问题特性决策——核心→深度搜索引擎，一般→免费搜索，中文→中文搜索引擎（百度等），语义→语义搜索

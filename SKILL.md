@@ -7,7 +7,7 @@ metadata:
   hermes:
     tags: [research, orion-research, multi-source, verification]
     related_skills: [wechat-article-reader, web-llm-caller]
-  version: 3.4.1
+  version: 3.5.0
 ---
 
 # Deep-Research Skill v3.4
@@ -44,6 +44,18 @@ metadata:
 **升级规则**：快速通道跑完发现来源打架或答案牵动决策 → 立即转深度，已查结果作为子问题输入不浪费。
 
 **引擎选择**：快速通道**无需读决策树**——单查默认走免费质量层 Searlo（配额易腐先烧）→ TinyFish → DDG 兜底；中文生态内容（公众号/知乎/百度系）用 Serper `site:`。默认层烧尽或结果差才升级，届时读 [references/sac-search-orchestration.md](references/sac-search-orchestration.md) 完整决策树（深度通道必读，引擎编排的单一权威源；此处默认顺序与该文件「调用原则」2026-08-24 定案同源，改动须两处同步）。
+
+## 蜂群编排（v3.5，深度通道 Step 2 可选并行化）
+
+**适用判据（三条全中才启用）**：① 子问题 ≥3 个且相互独立（A 的答案不改变 B 的问法）；② 每个子问题都需要抓原文（证据层重）；③ 预期总检索量 ≥10 查询。强耦合/需全局视野（问题树拆解、Step 4 验证、Step 5 报告）**禁止**蜂群——融合型任务单线最优（2026-09-02 定案）。快速通道禁用。
+
+**双层产出契约（转述损失从结构上断根）**：
+1. **证据层（子代理落盘，永不摘要化）**：每个子代理把所抓**原文全文**写 `~/.hermes/cache/delegation/swarm/<task>/subQ<n>-sources.md`（URL+全文+抓取时间逐条），查询变体与引擎选择过程写同目录 `<n>-trace.md`。父脑 Step 4 验证「引用≠支撑」时**直接读盘上原文**，不对二手摘要做验证。
+2. **决策层（output_schema 回传，机器验证）**：schema 必含字段 `findings[]（结论+关键数字+字段级出处URL）/ confidence(A-D)/ gotcha_check（G-001伪独立·G-013时效·G-014引用支撑 三项自查结果）/ conflicts[]/ sources[]/ evidence_file（落盘路径，必填）`——jsonschema validator 强制，缺字段一次有界重试。
+
+**父脑职责（不可下放的三件事）**：① Step 1 问题树拆解（每子代理一份 goal+context；context 里写明该子问题的查询变体、引擎选择依据、Gotcha 定义——**子代理不加载本 skill**，所有查询纪律必须由 context 携带）；② Step 4 统一复检（子代理 gotcha_check 是初筛非终审，父脑对盘上原文抽查 entailment）；③ Step 5 报告合成（只消费决策层 schema + 按需抽读证据层）。
+
+**调度纪律**：`delegate_task(tasks=[...])` 批量形态，并发=delegation.max_concurrent_children（默认 3）；子代理默认 leaf（禁再派生/禁 clarify/禁 memory/禁 send_message）；每子代理查询数 ≤6（子代理是查证单元不是二次调研）；限流铁律不变（同 API 串行+sleep(3)，子代理与父共享 20 RPM 总闸）；子代理轨迹原生落盘 `cache/delegation/live/`（tail -f 可监工）。**诊断口径**：完成后比对「子代理落盘原文条数 vs 决策层 sources 数」，缺口=丢线索点，记 Step 7。
 
 ## 工作流（7 步）= 深度通道
 
